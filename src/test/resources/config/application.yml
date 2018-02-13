@@ -100,3 +100,6 @@ jhipster:
 # ===================================================================
 
 application:
+    restTemplateConfig:
+        readTimeout: 350
+        connectTimeout: 550

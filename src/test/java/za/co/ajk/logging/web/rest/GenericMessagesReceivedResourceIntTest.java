@@ -50,6 +50,16 @@ public class GenericMessagesReceivedResourceIntTest {
     private static final Instant DEFAULT_DATE_RECEIVED = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_DATE_RECEIVED = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
+    private static final String MESSAGE_ID = "122";
+    private static final String PUB_SUB_TYPE_CODE = "C1";
+    private static final Long INCIDENT_NUMBER = 123l;
+    private static final String INCIDENT_HEADER = "Incident_header";
+    private static final String INCIDENT_DESCRIPTION = "Incident_description";
+    private static final String EVENT_TYPE_CODE = "EV1";
+    private static final String INCIDENT_PRIORITY_CODE = "PRIO1";
+    private static final String OPERATOR_NAME = "Operator1";
+    private static final String PAYLOAD = "Payload of incident";
+    
     @Autowired
     private GenericMessagesReceivedRepository genericMessagesReceivedRepository;
 
@@ -92,7 +102,18 @@ public class GenericMessagesReceivedResourceIntTest {
     public static GenericMessagesReceived createEntity() {
         GenericMessagesReceived genericMessagesReceived = new GenericMessagesReceived()
             .originatingModule(DEFAULT_ORIGINATING_MODULE)
-            .dateReceived(DEFAULT_DATE_RECEIVED);
+            .dateReceived(DEFAULT_DATE_RECEIVED)
+            .messageId(MESSAGE_ID)
+            .messageDateCreated(UPDATED_DATE_RECEIVED)
+            .pubSubMessageTypeCode(PUB_SUB_TYPE_CODE)
+            .incidentNumber(INCIDENT_NUMBER)
+            .incidentHeader(INCIDENT_HEADER)
+            .incidentDescription(INCIDENT_DESCRIPTION)
+            .eventTypeCode(EVENT_TYPE_CODE)
+            .incidentPriorityCode(INCIDENT_PRIORITY_CODE)
+            .operatorName(OPERATOR_NAME)
+            .payload(PAYLOAD);
+        
         return genericMessagesReceived;
     }
 
@@ -108,7 +129,7 @@ public class GenericMessagesReceivedResourceIntTest {
         int databaseSizeBeforeCreate = genericMessagesReceivedRepository.findAll().size();
 
         // Create the GenericMessagesReceived
-        restGenericMessagesReceivedMockMvc.perform(post("/api/generic-messages-receiveds")
+        restGenericMessagesReceivedMockMvc.perform(post("/api/generic-messages-received")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(genericMessagesReceived)))
             .andExpect(status().isCreated());
@@ -133,7 +154,7 @@ public class GenericMessagesReceivedResourceIntTest {
         genericMessagesReceived.setId("existing_id");
 
         // An entity with an existing ID cannot be created, so this API call must fail
-        restGenericMessagesReceivedMockMvc.perform(post("/api/generic-messages-receiveds")
+        restGenericMessagesReceivedMockMvc.perform(post("/api/generic-messages-received")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(genericMessagesReceived)))
             .andExpect(status().isBadRequest());
@@ -151,7 +172,7 @@ public class GenericMessagesReceivedResourceIntTest {
 
         // Create the GenericMessagesReceived, which fails.
 
-        restGenericMessagesReceivedMockMvc.perform(post("/api/generic-messages-receiveds")
+        restGenericMessagesReceivedMockMvc.perform(post("/api/generic-messages-received")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(genericMessagesReceived)))
             .andExpect(status().isBadRequest());
@@ -168,7 +189,7 @@ public class GenericMessagesReceivedResourceIntTest {
 
         // Create the GenericMessagesReceived, which fails.
 
-        restGenericMessagesReceivedMockMvc.perform(post("/api/generic-messages-receiveds")
+        restGenericMessagesReceivedMockMvc.perform(post("/api/generic-messages-received")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(genericMessagesReceived)))
             .andExpect(status().isBadRequest());
@@ -183,12 +204,12 @@ public class GenericMessagesReceivedResourceIntTest {
         genericMessagesReceivedRepository.save(genericMessagesReceived);
 
         // Get all the genericMessagesReceivedList
-        restGenericMessagesReceivedMockMvc.perform(get("/api/generic-messages-receiveds?sort=id,desc"))
+        restGenericMessagesReceivedMockMvc.perform(get("/api/generic-messages-received?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(genericMessagesReceived.getId())))
-            .andExpect(jsonPath("$.[*].originating_module").value(hasItem(DEFAULT_ORIGINATING_MODULE.toString())))
-            .andExpect(jsonPath("$.[*].date_received").value(hasItem(DEFAULT_DATE_RECEIVED.toString())));
+            .andExpect(jsonPath("$.[*].originatingModule").value(hasItem(DEFAULT_ORIGINATING_MODULE.toString())))
+            .andExpect(jsonPath("$.[*].dateReceived").value(hasItem(DEFAULT_DATE_RECEIVED.toString())));
     }
 
     @Test
@@ -197,18 +218,18 @@ public class GenericMessagesReceivedResourceIntTest {
         genericMessagesReceivedRepository.save(genericMessagesReceived);
 
         // Get the genericMessagesReceived
-        restGenericMessagesReceivedMockMvc.perform(get("/api/generic-messages-receiveds/{id}", genericMessagesReceived.getId()))
+        restGenericMessagesReceivedMockMvc.perform(get("/api/generic-messages-received/{id}", genericMessagesReceived.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(genericMessagesReceived.getId()))
-            .andExpect(jsonPath("$.originating_module").value(DEFAULT_ORIGINATING_MODULE.toString()))
-            .andExpect(jsonPath("$.date_received").value(DEFAULT_DATE_RECEIVED.toString()));
+            .andExpect(jsonPath("$.originatingModule").value(DEFAULT_ORIGINATING_MODULE.toString()))
+            .andExpect(jsonPath("$.dateReceived").value(DEFAULT_DATE_RECEIVED.toString()));
     }
 
     @Test
     public void getNonExistingGenericMessagesReceived() throws Exception {
         // Get the genericMessagesReceived
-        restGenericMessagesReceivedMockMvc.perform(get("/api/generic-messages-receiveds/{id}", Long.MAX_VALUE))
+        restGenericMessagesReceivedMockMvc.perform(get("/api/generic-messages-received/{id}", Long.MAX_VALUE))
             .andExpect(status().isNotFound());
     }
 
@@ -225,7 +246,7 @@ public class GenericMessagesReceivedResourceIntTest {
             .originatingModule(UPDATED_ORIGINATING_MODULE)
             .dateReceived(UPDATED_DATE_RECEIVED);
 
-        restGenericMessagesReceivedMockMvc.perform(put("/api/generic-messages-receiveds")
+        restGenericMessagesReceivedMockMvc.perform(put("/api/generic-messages-received")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(updatedGenericMessagesReceived)))
             .andExpect(status().isOk());
@@ -249,7 +270,7 @@ public class GenericMessagesReceivedResourceIntTest {
         // Create the GenericMessagesReceived
 
         // If the entity doesn't have an ID, it will be created instead of just being updated
-        restGenericMessagesReceivedMockMvc.perform(put("/api/generic-messages-receiveds")
+        restGenericMessagesReceivedMockMvc.perform(put("/api/generic-messages-received")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(genericMessagesReceived)))
             .andExpect(status().isCreated());
@@ -267,7 +288,7 @@ public class GenericMessagesReceivedResourceIntTest {
         int databaseSizeBeforeDelete = genericMessagesReceivedRepository.findAll().size();
 
         // Get the genericMessagesReceived
-        restGenericMessagesReceivedMockMvc.perform(delete("/api/generic-messages-receiveds/{id}", genericMessagesReceived.getId())
+        restGenericMessagesReceivedMockMvc.perform(delete("/api/generic-messages-received/{id}", genericMessagesReceived.getId())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
@@ -286,12 +307,12 @@ public class GenericMessagesReceivedResourceIntTest {
         genericMessagesReceivedService.save(genericMessagesReceived);
 
         // Search the genericMessagesReceived
-        restGenericMessagesReceivedMockMvc.perform(get("/api/_search/generic-messages-receiveds?query=id:" + genericMessagesReceived.getId()))
+        restGenericMessagesReceivedMockMvc.perform(get("/api/_search/generic-messages-received?query=id:" + genericMessagesReceived.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(genericMessagesReceived.getId())))
-            .andExpect(jsonPath("$.[*].originating_module").value(hasItem(DEFAULT_ORIGINATING_MODULE.toString())))
-            .andExpect(jsonPath("$.[*].date_received").value(hasItem(DEFAULT_DATE_RECEIVED.toString())));
+            .andExpect(jsonPath("$.[*].originatingModule").value(hasItem(DEFAULT_ORIGINATING_MODULE.toString())))
+            .andExpect(jsonPath("$.[*].dateReceived").value(hasItem(DEFAULT_DATE_RECEIVED.toString())));
     }
 
     @Test

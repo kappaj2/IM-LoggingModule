@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import za.co.ajk.logging.domain.GenericMessagesReceived;
-import za.co.ajk.logging.enums.EventType;
 import za.co.ajk.logging.enums.PubSubMessageType;
 import za.co.ajk.logging.repository.GenericMessagesReceivedRepository;
 import za.co.ajk.logging.service.messaging.IMMessageProcessor;
@@ -66,29 +65,24 @@ public class IMMessageProcessorImpl implements IMMessageProcessor {
             case INCIDENT:
                 try {
                     
-                    payload = message.getPayload().toString();
-                    
                     InterModulePubSubMessage inboundMessage = objectMapper
                         .readValue(message.getPayload().toString(), InterModulePubSubMessage.class);
                     
-                    EventType eventType = inboundMessage.getEventType();
-                    System.out.println(eventType.toString());
-    
                     GenericMessagesReceived gm = new GenericMessagesReceived();
+                    
                     gm.setDateReceived(Instant.now());
-                    gm.setOriginatingModule(inboundMessage.getOriginatingApplicationModuleName());
+                    gm.setEventTypeCode(inboundMessage.getEventType().getEventTypeCode());
+                    gm.setIncidentDescription(inboundMessage.getIncidentDescription());
+                    gm.setIncidentHeader(inboundMessage.getIncidentHeader());
+                    gm.setIncidentNumber(inboundMessage.getIncidentNumber());
+                    gm.setIncidentPriorityCode(inboundMessage.getIncidentPriority().getPriorityCode());
                     gm.setMessageId(messageId);
-                    gm.setPayload(payload);
-    
-                    inboundMessage.getEventType();
-                    inboundMessage.getIncidentDescription();
-                    inboundMessage.getIncidentHeader();
-                    inboundMessage.getIncidentNumber();
-                    inboundMessage.getIncidentPriority();
-                    inboundMessage.getOperatorName();
-                    inboundMessage.getPubSubMessageType();
-                    inboundMessage.getOriginatingApplicationModuleName();
-    
+                    gm.setOriginatingModule(inboundMessage.getOriginatingApplicationModuleName());
+                    gm.setMessageDateCreated(inboundMessage.getMessageDateCreated());
+                    gm.setOperatorName(inboundMessage.getOperatorName());
+                    gm.setPayload( message.getPayload().toString());
+                    gm.setPubSubMessageTypeCode(inboundMessage.getPubSubMessageType().getMessageTypeCode());
+                    
                     repository.save(gm);
                     
                 } catch (IOException io) {

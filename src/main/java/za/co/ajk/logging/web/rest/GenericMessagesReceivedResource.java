@@ -1,25 +1,31 @@
 package za.co.ajk.logging.web.rest;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.validation.Valid;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.codahale.metrics.annotation.Timed;
+import io.github.jhipster.web.util.ResponseUtil;
 import za.co.ajk.logging.domain.GenericMessagesReceived;
 import za.co.ajk.logging.service.GenericMessagesReceivedService;
 import za.co.ajk.logging.web.rest.errors.BadRequestAlertException;
 import za.co.ajk.logging.web.rest.util.HeaderUtil;
-import io.github.jhipster.web.util.ResponseUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * REST controller for managing GenericMessagesReceived.
@@ -39,13 +45,13 @@ public class GenericMessagesReceivedResource {
     }
 
     /**
-     * POST  /generic-messages-receiveds : Create a new genericMessagesReceived.
+     * POST  /generic-messages-received : Create a new genericMessagesReceived.
      *
      * @param genericMessagesReceived the genericMessagesReceived to create
      * @return the ResponseEntity with status 201 (Created) and with body the new genericMessagesReceived, or with status 400 (Bad Request) if the genericMessagesReceived has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @PostMapping("/generic-messages-receiveds")
+    @PostMapping("/generic-messages-received")
     @Timed
     public ResponseEntity<GenericMessagesReceived> createGenericMessagesReceived(@Valid @RequestBody GenericMessagesReceived genericMessagesReceived) throws URISyntaxException {
         log.debug("REST request to save GenericMessagesReceived : {}", genericMessagesReceived);
@@ -59,7 +65,7 @@ public class GenericMessagesReceivedResource {
     }
 
     /**
-     * PUT  /generic-messages-receiveds : Updates an existing genericMessagesReceived.
+     * PUT  /generic-messages-received : Updates an existing genericMessagesReceived.
      *
      * @param genericMessagesReceived the genericMessagesReceived to update
      * @return the ResponseEntity with status 200 (OK) and with body the updated genericMessagesReceived,
@@ -67,7 +73,7 @@ public class GenericMessagesReceivedResource {
      * or with status 500 (Internal Server Error) if the genericMessagesReceived couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @PutMapping("/generic-messages-receiveds")
+    @PutMapping("/generic-messages-received")
     @Timed
     public ResponseEntity<GenericMessagesReceived> updateGenericMessagesReceived(@Valid @RequestBody GenericMessagesReceived genericMessagesReceived) throws URISyntaxException {
         log.debug("REST request to update GenericMessagesReceived : {}", genericMessagesReceived);
@@ -81,11 +87,11 @@ public class GenericMessagesReceivedResource {
     }
 
     /**
-     * GET  /generic-messages-receiveds : get all the genericMessagesReceiveds.
+     * GET  /generic-messages-received : get all the genericMessagesReceiveds.
      *
      * @return the ResponseEntity with status 200 (OK) and the list of genericMessagesReceiveds in body
      */
-    @GetMapping("/generic-messages-receiveds")
+    @GetMapping("/generic-messages-received")
     @Timed
     public List<GenericMessagesReceived> getAllGenericMessagesReceiveds() {
         log.debug("REST request to get all GenericMessagesReceiveds");
@@ -98,7 +104,7 @@ public class GenericMessagesReceivedResource {
      * @param id the id of the genericMessagesReceived to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the genericMessagesReceived, or with status 404 (Not Found)
      */
-    @GetMapping("/generic-messages-receiveds/{id}")
+    @GetMapping("/generic-messages-received/{id}")
     @Timed
     public ResponseEntity<GenericMessagesReceived> getGenericMessagesReceived(@PathVariable String id) {
         log.debug("REST request to get GenericMessagesReceived : {}", id);
@@ -107,12 +113,12 @@ public class GenericMessagesReceivedResource {
     }
 
     /**
-     * DELETE  /generic-messages-receiveds/:id : delete the "id" genericMessagesReceived.
+     * DELETE  /generic-messages-received/:id : delete the "id" genericMessagesReceived.
      *
      * @param id the id of the genericMessagesReceived to delete
      * @return the ResponseEntity with status 200 (OK)
      */
-    @DeleteMapping("/generic-messages-receiveds/{id}")
+    @DeleteMapping("/generic-messages-received/{id}")
     @Timed
     public ResponseEntity<Void> deleteGenericMessagesReceived(@PathVariable String id) {
         log.debug("REST request to delete GenericMessagesReceived : {}", id);
@@ -121,13 +127,13 @@ public class GenericMessagesReceivedResource {
     }
 
     /**
-     * SEARCH  /_search/generic-messages-receiveds?query=:query : search for the genericMessagesReceived corresponding
+     * SEARCH  /_search/generic-messages-received?query=:query : search for the genericMessagesReceived corresponding
      * to the query.
      *
      * @param query the query of the genericMessagesReceived search
      * @return the result of the search
      */
-    @GetMapping("/_search/generic-messages-receiveds")
+    @GetMapping("/_search/generic-messages-received")
     @Timed
     public List<GenericMessagesReceived> searchGenericMessagesReceiveds(@RequestParam String query) {
         log.debug("REST request to search GenericMessagesReceiveds for query {}", query);

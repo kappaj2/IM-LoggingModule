@@ -1,6 +1,7 @@
 package za.co.ajk.logging.service.messaging.impl;
 
 import java.io.IOException;
+import java.time.Instant;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,8 +10,9 @@ import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import za.co.ajk.logging.enums.EventType;
+import za.co.ajk.logging.domain.GenericMessagesReceived;
 import za.co.ajk.logging.enums.PubSubMessageType;
+import za.co.ajk.logging.repository.GenericMessagesReceivedRepository;
 import za.co.ajk.logging.service.messaging.IMMessageProcessor;
 import za.co.ajk.logging.service.messaging.InterModulePubSubMessage;
 
@@ -22,6 +24,9 @@ public class IMMessageProcessorImpl implements IMMessageProcessor {
     
     @Autowired
     private ObjectMapper objectMapper;
+    
+    @Autowired
+    private GenericMessagesReceivedRepository repository;
     
     @Override
     public void processMessageReceived(Message<?> message) {
@@ -42,15 +47,17 @@ public class IMMessageProcessorImpl implements IMMessageProcessor {
         switch (messageType) {
             case GENERIC:
                 try {
-                    try {
-                        log.info("Generic message received ...");
-                        // sendTestMessage();
-                        
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
                     
+                    log.info("Generic message received ...");
                     payload = objectMapper.readValue(message.getPayload().toString(), String.class);
+                    
+                    GenericMessagesReceived gm = new GenericMessagesReceived();
+                    gm.setDateReceived(Instant.now());
+                    gm.setMessageId(messageId);
+                    gm.setPayload(payload);
+                    
+                    repository.save(gm);
+                    
                 } catch (IOException ioe) {
                     log.error("Error parsing payload : ", ioe.getMessage());
                 }
@@ -58,15 +65,25 @@ public class IMMessageProcessorImpl implements IMMessageProcessor {
             case INCIDENT:
                 try {
                     
-                    payload = message.getPayload().toString();
-                    
                     InterModulePubSubMessage inboundMessage = objectMapper
                         .readValue(message.getPayload().toString(), InterModulePubSubMessage.class);
                     
-                    EventType eventType = inboundMessage.getEventType();
-                    System.out.println(eventType.toString());
+                    GenericMessagesReceived gm = new GenericMessagesReceived();
                     
-                    // sendTestMessage();
+                    gm.setDateReceived(Instant.now());
+                    gm.setEventTypeCode(inboundMessage.getEventType().getEventTypeCode());
+                    gm.setIncidentDescription(inboundMessage.getIncidentDescription());
+                    gm.setIncidentHeader(inboundMessage.getIncidentHeader());
+                    gm.setIncidentNumber(inboundMessage.getIncidentNumber());
+                    gm.setIncidentPriorityCode(inboundMessage.getIncidentPriority().getPriorityCode());
+                    gm.setMessageId(messageId);
+                    gm.setOriginatingModule(inboundMessage.getOriginatingApplicationModuleName());
+                    gm.setMessageDateCreated(inboundMessage.getMessageDateCreated());
+                    gm.setOperatorName(inboundMessage.getOperatorName());
+                    gm.setPayload( message.getPayload().toString());
+                    gm.setPubSubMessageTypeCode(inboundMessage.getPubSubMessageType().getMessageTypeCode());
+                    
+                    repository.save(gm);
                     
                 } catch (IOException io) {
                     io.printStackTrace();

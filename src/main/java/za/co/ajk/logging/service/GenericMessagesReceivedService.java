@@ -1,26 +1,27 @@
 package za.co.ajk.logging.service;
 
-import za.co.ajk.logging.domain.GenericMessagesReceived;
-import za.co.ajk.logging.repository.GenericMessagesReceivedRepository;
-import za.co.ajk.logging.repository.search.GenericMessagesReceivedSearchRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import za.co.ajk.logging.domain.GenericMessagesReceived;
+import za.co.ajk.logging.repository.GenericMessagesReceivedRepository;
+import za.co.ajk.logging.repository.search.GenericMessagesReceivedSearchRepository;
+
+import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
 /**
  * Service Implementation for managing GenericMessagesReceived.
  */
 @Service
 public class GenericMessagesReceivedService {
-
-    private final Logger log = LoggerFactory.getLogger(GenericMessagesReceivedService.class);
-
+    
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
     private final GenericMessagesReceivedRepository genericMessagesReceivedRepository;
 
     private final GenericMessagesReceivedSearchRepository genericMessagesReceivedSearchRepository;

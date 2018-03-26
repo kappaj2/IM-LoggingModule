@@ -38,9 +38,8 @@ import za.co.ajk.logging.config.MessageImplementationCondition;
 import za.co.ajk.logging.config.PubSubMessagingProperties;
 import za.co.ajk.logging.enums.PubSubMessageType;
 import za.co.ajk.logging.service.messaging.IMMessageProcessor;
-import za.co.ajk.logging.service.messaging.InterModulePubSubMessage;
+import za.co.ajk.logging.service.messaging.dto.InterModulePubSubMessage;
 import za.co.ajk.logging.service.messaging.googlepubsub.GoogleChannelManager;
-
 
 @Component
 @Configuration
@@ -128,12 +127,12 @@ public class GoogleChannelManagerImpl implements GoogleChannelManager {
     }
     
     @Bean
-    public PubSubInboundChannelAdapter messageChannelAdapterBillingSub(
+    public PubSubInboundChannelAdapter messageChannelAdapterIncidentSub(
         @Qualifier("pubsubInputChannel")
             MessageChannel inputChannel) {
         try {
             PubSubInboundChannelAdapter adapter =
-                new PubSubInboundChannelAdapter(pubSubTemplate, "LoggingTopicSub");
+                new PubSubInboundChannelAdapter(pubSubTemplate, "IncidentTopicSub");
             adapter
                 .setOutputChannel(
                     inputChannel); // looks like the channel to ack on (thus the input channel - confusing!)
@@ -161,13 +160,10 @@ public class GoogleChannelManagerImpl implements GoogleChannelManager {
     @ServiceActivator(inputChannel = "pubsubInputChannel")
     public MessageHandler messageReceiver() {
         return (Message<?> message) -> {
-            
             imMessageProcessor.processMessageReceived(message);
-            
             AckReplyConsumer consumer =
-                (AckReplyConsumer) message.getHeaders().get(GcpHeaders.ACKNOWLEDGEMENT);
+                 message.getHeaders().get(GcpHeaders.ACKNOWLEDGEMENT, AckReplyConsumer.class);
             consumer.ack();
-            
         };
     }
     

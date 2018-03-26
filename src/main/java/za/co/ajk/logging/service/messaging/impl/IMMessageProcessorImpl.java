@@ -14,7 +14,7 @@ import za.co.ajk.logging.domain.GenericMessagesReceived;
 import za.co.ajk.logging.enums.PubSubMessageType;
 import za.co.ajk.logging.repository.GenericMessagesReceivedRepository;
 import za.co.ajk.logging.service.messaging.IMMessageProcessor;
-import za.co.ajk.logging.service.messaging.InterModulePubSubMessage;
+import za.co.ajk.logging.service.messaging.dto.InterModulePubSubMessage;
 
 
 @Component(value = "imMessageProcessor")
@@ -49,13 +49,24 @@ public class IMMessageProcessorImpl implements IMMessageProcessor {
                 try {
                     
                     log.info("Generic message received ...");
-                    payload = objectMapper.readValue(message.getPayload().toString(), String.class);
-                    
+                    InterModulePubSubMessage inboundMessage = objectMapper
+                        .readValue(message.getPayload().toString(), InterModulePubSubMessage.class);
+    
                     GenericMessagesReceived gm = new GenericMessagesReceived();
+    
                     gm.setDateReceived(Instant.now());
+                    gm.setEventTypeCode(inboundMessage.getEventType().getEventTypeCode());
+                    gm.setIncidentDescription(inboundMessage.getIncidentDescription());
+                    gm.setIncidentHeader(inboundMessage.getIncidentHeader());
+                    gm.setIncidentNumber(inboundMessage.getIncidentNumber() == null ? 0L: inboundMessage.getIncidentNumber());
+                    gm.setIncidentPriorityCode(inboundMessage.getIncidentPriority().getPriorityCode());
                     gm.setMessageId(messageId);
-                    gm.setPayload(payload);
-                    
+                    gm.setOriginatingModule(inboundMessage.getOriginatingApplicationModuleName());
+                    gm.setMessageDateCreated(inboundMessage.getMessageDateCreated());
+                    gm.setOperatorName(inboundMessage.getOperatorName());
+                    gm.setPayload( message.getPayload().toString());
+                    gm.setPubSubMessageTypeCode(inboundMessage.getPubSubMessageType().getMessageTypeCode());
+    
                     repository.save(gm);
                     
                 } catch (IOException ioe) {

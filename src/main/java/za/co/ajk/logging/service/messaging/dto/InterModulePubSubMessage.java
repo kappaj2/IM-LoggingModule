@@ -1,4 +1,4 @@
-package za.co.ajk.logging.service.messaging;
+package za.co.ajk.logging.service.messaging.dto;
 
 import java.time.Instant;
 
@@ -7,10 +7,11 @@ import lombok.Data;
 import za.co.ajk.logging.enums.EventType;
 import za.co.ajk.logging.enums.IncidentPriority;
 import za.co.ajk.logging.enums.PubSubMessageType;
+import za.co.ajk.logging.service.messaging.InterModuleMessage;
 
 
 @Data
-public class InterModulePubSubMessage implements InterModuleMessage{
+public class InterModulePubSubMessage implements InterModuleMessage {
     
     /**
      * Determine the Inter module message type.
